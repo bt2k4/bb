@@ -128,72 +128,96 @@ export const levelConfigs = [
     // ------------------------------
     // World 3 (Levels 13-18): Visibility & Deception
     // ------------------------------
-    // Level 13: Ghost bubbles add semi-opaque target tracking.
+    // Level 13: Diagonal ghost lane with center tempo anchor.
     {
         bubbles: [
-            { x: 220, y: 150, size: 3, type: 'ghost' },
-            { x: 440, y: 150, size: 3, type: 'fast' },
+            { x: 180, y: 150, size: 3, type: 'ghost' },
+            { x: 340, y: 210, size: 2, type: 'fast' },
+            { x: 500, y: 270, size: 2, type: 'drifter' },
             { x: 660, y: 150, size: 3, type: 'ghost' }
         ]
     },
-    // Level 14: Ghost + drifter pacing to teach delayed threat reads.
+    // Level 14: Visibility remix split by a small platform shelf.
     {
         bubbles: [
             { x: 220, y: 150, size: 3, type: 'ghost' },
-            { x: 440, y: 160, size: 3, type: 'drifter' },
-            { x: 660, y: 150, size: 3, type: 'ghost' },
-            { x: 400, y: 230, size: 2, type: 'rubber' }
-        ]
+            { x: 580, y: 150, size: 3, type: 'ghost' },
+            { x: 300, y: 460, size: 2, type: 'drifter' },
+            { x: 520, y: 460, size: 2, type: 'rubber' }
+        ],
+        platforms: [
+            { x: 140, y: 330, width: 520, height: 22 }
+        ],
+        ladders: [
+            { x: 700, y: 330, width: 28, height: 370 }
+        ],
+        ceilingSpikes: false
     },
-    // Level 15: Phase-shift debut with simple escorts.
+    // Level 15: Phase-shift debut in mirrored columns.
     {
         bubbles: [
-            { x: 280, y: 150, size: 3, type: 'phaseShift' },
-            { x: 540, y: 150, size: 3, type: 'standard' },
-            { x: 400, y: 230, size: 2, type: 'fast' }
-        ]
+            { x: 260, y: 150, size: 3, type: 'phaseShift' },
+            { x: 540, y: 150, size: 3, type: 'phaseShift' },
+            { x: 400, y: 230, size: 2, type: 'fast' },
+            { x: 400, y: 520, size: 2, type: 'standard' }
+        ],
+        platforms: [
+            { x: 0, y: 360, width: 800, height: 22 }
+        ],
+        ladders: [
+            { x: 90, y: 360, width: 28, height: 340 }
+        ],
+        ceilingSpikes: false
     },
-    // Level 16: Phase-shift and ghost split lanes through a gate.
+    // Level 16: Phase/ghost gate with opposite-side unlock condition.
     {
         bubbles: [
-            { x: 220, y: 150, size: 3, type: 'phaseShift' },
-            { x: 520, y: 150, size: 3, type: 'ghost' },
-            { x: 360, y: 230, size: 2, type: 'drifter' },
-            { x: 600, y: 230, size: 2, type: 'fast' }
+            { x: 180, y: 150, size: 3, type: 'phaseShift' },
+            { x: 360, y: 190, size: 2, type: 'fast' },
+            { x: 620, y: 150, size: 3, type: 'ghost' },
+            { x: 520, y: 240, size: 2, type: 'drifter' }
         ],
         walls: [
             {
                 x: 420,
                 width: 18,
                 doorHeight: 68,
-                unlockRegion: { xMin: 0, xMax: 420 }
+                unlockRegion: { xMin: 420, xMax: 800 }
             }
         ]
     },
-    // Level 17: Rhythm debut layered with deceptive movement.
+    // Level 17: Rhythm puzzle with a center shelf and low lane.
     {
         bubbles: [
-            { x: 220, y: 150, size: 3, type: 'rhythm' },
-            { x: 440, y: 150, size: 3, type: 'ghost' },
-            { x: 660, y: 150, size: 3, type: 'phaseShift' },
-            { x: 400, y: 230, size: 2, type: 'fast' }
-        ]
+            { x: 220, y: 160, size: 3, type: 'rhythm' },
+            { x: 580, y: 160, size: 3, type: 'ghost' },
+            { x: 300, y: 510, size: 2, type: 'fast' },
+            { x: 520, y: 510, size: 2, type: 'phaseShift' }
+        ],
+        platforms: [
+            { x: 100, y: 350, width: 600, height: 22 }
+        ],
+        ladders: [
+            { x: 40, y: 350, width: 28, height: 350 },
+            { x: 730, y: 350, width: 28, height: 350 }
+        ],
+        ceilingSpikes: false
     },
-    // Level 18: World exam with deception trio and route gate.
+    // Level 18: World exam with route split and deception trio.
     {
         bubbles: [
-            { x: 220, y: 150, size: 3, type: 'phaseShift' },
-            { x: 440, y: 150, size: 3, type: 'rhythm' },
-            { x: 660, y: 150, size: 3, type: 'ghost' },
-            { x: 320, y: 230, size: 2, type: 'fast' },
-            { x: 560, y: 230, size: 2, type: 'zigzag' }
+            { x: 180, y: 150, size: 3, type: 'phaseShift' },
+            { x: 400, y: 150, size: 3, type: 'rhythm' },
+            { x: 620, y: 150, size: 3, type: 'ghost' },
+            { x: 280, y: 250, size: 2, type: 'fast' },
+            { x: 520, y: 250, size: 2, type: 'zigzag' }
         ],
         walls: [
             {
                 x: 360,
                 width: 18,
                 doorHeight: 68,
-                unlockRegion: { xMin: 360, xMax: 800 }
+                unlockRegion: { xMin: 0, xMax: 360 }
             }
         ]
     },
@@ -201,13 +225,13 @@ export const levelConfigs = [
     // ------------------------------
     // World 4 (Levels 19-24): Gates & Routing
     // ------------------------------
-    // Level 19: Simple left-clear gate with heavy anchor.
+    // Level 19: Dual-anchor gate with off-center pressure lanes.
     {
         bubbles: [
-            { x: 260, y: 150, size: 4, type: 'heavy' },
-            { x: 520, y: 180, size: 2, type: 'fast' },
-            { x: 320, y: 220, size: 2, type: 'drifter' },
-            { x: 620, y: 220, size: 2, type: 'zigzag' }
+            { x: 200, y: 150, size: 4, type: 'heavy' },
+            { x: 600, y: 150, size: 3, type: 'fast' },
+            { x: 320, y: 230, size: 2, type: 'drifter' },
+            { x: 520, y: 230, size: 2, type: 'zigzag' }
         ],
         walls: [
             {
@@ -218,13 +242,13 @@ export const levelConfigs = [
             }
         ]
     },
-    // Level 20: Armored debut in a right-clear route.
+    // Level 20: Armored route check with stacked threat timings.
     {
         bubbles: [
             { x: 220, y: 150, size: 4, type: 'armored' },
-            { x: 520, y: 170, size: 3, type: 'fast' },
-            { x: 340, y: 230, size: 2, type: 'fast' },
-            { x: 620, y: 230, size: 2, type: 'zigzag' }
+            { x: 540, y: 170, size: 3, type: 'fast' },
+            { x: 320, y: 240, size: 2, type: 'rhythm' },
+            { x: 620, y: 240, size: 2, type: 'zigzag' }
         ],
         walls: [
             {
@@ -235,12 +259,19 @@ export const levelConfigs = [
             }
         ]
     },
-    // Level 21: Dual-lane gate puzzle with rhythm control.
+    // Level 21: Three-lane gate puzzle with compact mid shelf.
     {
         bubbles: [
-            { x: 220, y: 150, size: 3, type: 'rhythm' },
-            { x: 580, y: 150, size: 3, type: 'fast' },
-            { x: 400, y: 220, size: 2, type: 'phaseShift' }
+            { x: 200, y: 150, size: 3, type: 'rhythm' },
+            { x: 600, y: 150, size: 3, type: 'fast' },
+            { x: 280, y: 500, size: 2, type: 'phaseShift' },
+            { x: 520, y: 500, size: 2, type: 'drifter' }
+        ],
+        platforms: [
+            { x: 150, y: 330, width: 500, height: 22 }
+        ],
+        ladders: [
+            { x: 730, y: 330, width: 28, height: 370 }
         ],
         walls: [
             {
@@ -249,27 +280,28 @@ export const levelConfigs = [
                 doorHeight: 68,
                 unlockRegion: { xMin: 0, xMax: 440 }
             }
-        ]
+        ],
+        ceilingSpikes: false
     },
-    // Level 22: Tiny swarm route-check with armored core.
+    // Level 22: Tiny swarm remix with backline armored core.
     {
         bubbles: [
-            { x: 140, y: 150, size: 1, type: 'fast' },
-            { x: 220, y: 150, size: 1, type: 'zigzag' },
-            { x: 300, y: 150, size: 1, type: 'fast' },
-            { x: 380, y: 150, size: 1, type: 'zigzag' },
-            { x: 460, y: 150, size: 1, type: 'fast' },
-            { x: 540, y: 150, size: 1, type: 'rhythm' },
-            { x: 620, y: 150, size: 1, type: 'fast' },
-            { x: 700, y: 150, size: 1, type: 'zigzag' },
-            { x: 400, y: 220, size: 2, type: 'armored' }
+            { x: 120, y: 150, size: 1, type: 'fast' },
+            { x: 200, y: 150, size: 1, type: 'zigzag' },
+            { x: 280, y: 150, size: 1, type: 'phaseShift' },
+            { x: 360, y: 150, size: 1, type: 'fast' },
+            { x: 440, y: 150, size: 1, type: 'rhythm' },
+            { x: 520, y: 150, size: 1, type: 'fast' },
+            { x: 600, y: 150, size: 1, type: 'zigzag' },
+            { x: 680, y: 150, size: 1, type: 'fast' },
+            { x: 400, y: 240, size: 2, type: 'armored' }
         ],
         walls: [
             {
                 x: 400,
                 width: 18,
                 doorHeight: 68,
-                unlockRegion: { xMin: 0, xMax: 400 }
+                unlockRegion: { xMin: 400, xMax: 800 }
             }
         ]
     },
