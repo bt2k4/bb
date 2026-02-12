@@ -29,6 +29,8 @@ export const Game = {
     walls: [],
     platforms: [],
     ladders: [],
+    lasers: [],
+    laserFrameTick: 0,
     ceilingSpikesEnabled: true,
     activeLadder: null,
     particles: [],
@@ -126,6 +128,8 @@ export const Game = {
         this.walls = [];
         this.platforms = [];
         this.ladders = [];
+        this.lasers = [];
+        this.laserFrameTick = 0;
         this.activeLadder = null;
         this.dropItems = [];
         this.bullets = [];
@@ -156,6 +160,9 @@ export const Game = {
         const ladderConfigs = Array.isArray(config)
             ? []
             : (config.ladders || []);
+        const laserConfigs = Array.isArray(config)
+            ? []
+            : (config.lasers || []);
         const ceilingSpikesEnabled = Array.isArray(config)
             ? true
             : (config.ceilingSpikes !== false);
@@ -172,6 +179,16 @@ export const Game = {
         this.walls = wallConfigs.map((c) => new Wall(c));
         this.platforms = platformConfigs.map((c) => ({ ...c }));
         this.ladders = ladderConfigs.map((c) => ({ ...c }));
+        this.lasers = laserConfigs.map((c) => ({
+            x: c.x,
+            y: c.y ?? GAME_CONFIG.UI_HEIGHT,
+            width: c.width ?? 10,
+            height: c.height ?? (GAME_CONFIG.CANVAS_HEIGHT - (c.y ?? GAME_CONFIG.UI_HEIGHT)),
+            interval: Math.max(30, c.interval ?? 180),
+            activeFrames: Math.max(10, c.activeFrames ?? 80),
+            phase: c.phase ?? 0,
+            active: false
+        }));
         this.ceilingSpikesEnabled = ceilingSpikesEnabled;
         this.closingWallEnabled = closingWallEnabled;
 
@@ -190,6 +207,8 @@ export const Game = {
         this.walls = [];
         this.platforms = [];
         this.ladders = [];
+        this.lasers = [];
+        this.laserFrameTick = 0;
         this.activeLadder = null;
         this.powerWireDropsThisLevel = 0;
         this.powerWireDropCooldown = 0;
@@ -284,6 +303,7 @@ export const Game = {
                 this.updateDropItems();
                 this.updateAutoGun();
                 this.updateClosingWallProgress();
+                this.updateLasers();
 
                 const bubbleSpeedScale = this.slowMoTimer > 0
                     ? GAME_CONFIG.SLOW_MO_FACTOR
@@ -320,6 +340,7 @@ export const Game = {
                 this.resolvePlatformCollisions();
                 this.resolveWallCollisions();
                 this.resolveClosingWallBubbleCollisions();
+                this.resolveLaserBubbleCollisions();
                 this.resolveBulletWallCollisions();
                 this.resolveBulletPlatformCollisions();
                 this.resolveHarpoonWallCollisions();
@@ -329,7 +350,8 @@ export const Game = {
                 this.processBulletCollisions();
                 this.processBubbleCollisions();
 
-                if (Player.checkBubbleCollision(this.bubbles)) {
+                if (this.checkLaserPlayerCollision() ||
+                    Player.checkBubbleCollision(this.bubbles)) {
                     this.loseLife();
                     this.lastFrameTime = 0;
                     return;
@@ -344,6 +366,7 @@ export const Game = {
             Renderer.drawPlatforms(this.platforms);
             Renderer.drawLadders(this.ladders);
             Renderer.drawWalls(this.walls);
+            Renderer.drawLasers(this.lasers);
             Renderer.drawEntities(
                 this.bubbles, 
                 this.particles, 
@@ -384,6 +407,70 @@ export const Game = {
         const targetX = -this.closingWallWidth + maxTravel * progress;
         const lerpSpeed = 0.16;
         this.closingWallX += (targetX - this.closingWallX) * lerpSpeed;
+    },
+
+
+    updateLasers() {
+        if (!this.lasers.length) {
+            this.laserFrameTick = 0;
+            return;
+        }
+        this.laserFrameTick += 1;
+        for (const laser of this.lasers) {
+            const cycle = Math.max(1, laser.interval);
+            const t = (this.laserFrameTick + laser.phase) % cycle;
+            laser.active = t < laser.activeFrames;
+        }
+    },
+
+    checkLaserPlayerCollision() {
+        if (!this.lasers.length || Player.invulnerableTimer > 0) {
+            return false;
+        }
+        const playerRect = {
+            x: Player.x - Player.width / 2,
+            y: Player.y,
+            width: Player.width,
+            height: Player.height
+        };
+        for (const laser of this.lasers) {
+            if (!laser.active) continue;
+            const beamRect = {
+                x: laser.x,
+                y: laser.y,
+                width: laser.width,
+                height: laser.height
+            };
+            if (this.checkRectIntersection(playerRect, beamRect)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    resolveLaserBubbleCollisions() {
+        if (!this.lasers.length || this.bubbles.length === 0) return;
+        for (const laser of this.lasers) {
+            if (!laser.active) continue;
+            const beamRect = {
+                x: laser.x,
+                y: laser.y,
+                width: laser.width,
+                height: laser.height
+            };
+            for (const bubble of this.bubbles) {
+                if (!this.checkCircleRectCollision(bubble, beamRect)) {
+                    continue;
+                }
+                if (bubble.x < beamRect.x + beamRect.width / 2) {
+                    bubble.x = beamRect.x - bubble.radius;
+                    bubble.speedX = -Math.abs(bubble.speedX);
+                } else {
+                    bubble.x = beamRect.x + beamRect.width + bubble.radius;
+                    bubble.speedX = Math.abs(bubble.speedX);
+                }
+            }
+        }
     },
 
     trackFps(timestamp) {

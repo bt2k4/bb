@@ -282,6 +282,43 @@ export const Renderer = {
         ctx.restore();
     },
 
+
+    drawLasers(lasers) {
+        if (!lasers || lasers.length === 0) return;
+        const ctx = this.ctx;
+        const theme = UI.getCurrentTheme();
+        const primary = theme.vars['--accent'] || theme.vars['--primary'];
+        ctx.save();
+        for (const laser of lasers) {
+            const emitterY = laser.y - 8;
+            ctx.fillStyle = 'rgba(20, 24, 32, 0.95)';
+            ctx.fillRect(laser.x - 8, emitterY, laser.width + 16, 8);
+
+            if (!laser.active) {
+                ctx.fillStyle = 'rgba(255, 180, 80, 0.7)';
+                ctx.fillRect(laser.x + laser.width / 2 - 2, emitterY + 2, 4, 4);
+                continue;
+            }
+
+            const beamGradient = ctx.createLinearGradient(
+                laser.x,
+                laser.y,
+                laser.x + laser.width,
+                laser.y
+            );
+            beamGradient.addColorStop(0, themeColorToRgba(primary, 0.2));
+            beamGradient.addColorStop(0.5, themeColorToRgba(primary, 0.75));
+            beamGradient.addColorStop(1, themeColorToRgba(primary, 0.2));
+            ctx.fillStyle = beamGradient;
+            ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
+
+            ctx.strokeStyle = themeColorToRgba(primary, 0.9);
+            ctx.lineWidth = 2;
+            ctx.strokeRect(laser.x + 1, laser.y, Math.max(0, laser.width - 2), laser.height);
+        }
+        ctx.restore();
+    },
+
     drawWalls(walls) {
         const ctx = this.ctx;
         const theme = UI.getCurrentTheme();

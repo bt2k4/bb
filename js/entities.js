@@ -348,6 +348,7 @@ export class Bubble {
         this.phaseShiftActive = false;
         this.phaseShiftTimer = 0;
         this.rhythmPhase = 0;
+        this.teleportTimer = 0;
         this.armorHitsRequired = 0;
         this.armorHitFlashTimer = 0;
 
@@ -395,6 +396,13 @@ export class Bubble {
         } else if (this.type === 'rhythm') {
             this.speedX *= 1.3;
             this.rhythmPhase = Math.random() * Math.PI * 2;
+        } else if (this.type === 'teleport') {
+            this.speedX *= 1.25;
+            this.teleportTimer = Math.floor(Math.random() * 90) + 80;
+        } else if (this.type === 'volatile') {
+            this.speedX *= 1.45;
+            this.gravity = 0.26;
+            this.minBounceSpeed *= 1.15;
         }
 
         const bounceMargin = 10;
@@ -421,6 +429,8 @@ export class Bubble {
         if (this.type === 'phaseShift') this.color = '#8B7CFF';
         if (this.type === 'armored') this.color = '#FF8C00';
         if (this.type === 'rhythm') this.color = '#00FFA8';
+        if (this.type === 'teleport') this.color = '#5DA9FF';
+        if (this.type === 'volatile') this.color = '#FF3366';
     }
 
     update(speedScale = 1, ceilingSpikesEnabled = true) {
@@ -457,6 +467,18 @@ export class Bubble {
             if (this.phaseShiftTimer <= 0) {
                 this.phaseShiftActive = !this.phaseShiftActive;
                 this.phaseShiftTimer = this.phaseShiftActive ? 60 : 120;
+            }
+        }
+
+        if (this.type === 'teleport') {
+            this.teleportTimer -= speedScale;
+            if (this.teleportTimer <= 0) {
+                const margin = this.radius + 24;
+                const minX = margin;
+                const maxX = GAME_CONFIG.CANVAS_WIDTH - margin;
+                this.x = minX + Math.random() * Math.max(1, maxX - minX);
+                this.speedX *= -1;
+                this.teleportTimer = Math.floor(Math.random() * 80) + 70;
             }
         }
         if (this.armorHitFlashTimer > 0) {
@@ -554,6 +576,21 @@ export class Bubble {
             );
             b1.speedX = -1.8 * (this.type === 'fast' ? 1.5 : 1);
             b2.speedX = 1.8 * (this.type === 'fast' ? 1.5 : 1);
+            if (this.type === 'volatile') {
+                const b3 = new Bubble(
+                    this.x,
+                    this.y - 22,
+                    this.size - 1,
+                    this.type,
+                    childHitCount
+                );
+                b3.speedY = -Math.min(
+                    b3.minBounceSpeed + b3.hitCount * 1.2,
+                    b3.maxBounceSpeed
+                );
+                b3.speedX = (Math.random() - 0.5) * 2.4;
+                return [b1, b2, b3];
+            }
             return [b1, b2];
         }
         return [];
