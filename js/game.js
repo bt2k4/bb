@@ -2,7 +2,7 @@
 import { AudioSystem } from './audio.js';
 import { GAME_CONFIG } from './config.js';
 import { Bubble, Bullet, DropItem, Particle, Wall } from './entities.js';
-import { levelConfigs } from './levels.js';
+import { levelConfigs, LEVELS_PER_WORLD, worldBackgroundPresets } from './levels.js';
 import { Player, Harpoon } from './player.js';
 import { Renderer } from './renderer.js';
 import { Storage } from './storage.js';
@@ -30,6 +30,8 @@ export const Game = {
     platforms: [],
     ladders: [],
     ceilingSpikesEnabled: true,
+    currentWorld: 1,
+    currentBackgroundPreset: 'gridClassic',
     activeLadder: null,
     particles: [],
     dropItems: [],
@@ -162,6 +164,10 @@ export const Game = {
         const closingWallEnabled = Array.isArray(config)
             ? false
             : Boolean(config.closingWall);
+        const worldIndex = Math.floor((level - 1) / LEVELS_PER_WORLD) + 1;
+        const backgroundPreset = Array.isArray(config)
+            ? (worldBackgroundPresets[worldIndex] || 'gridClassic')
+            : (config.backgroundPreset || worldBackgroundPresets[worldIndex] || 'gridClassic');
 
         for (const c of bubbleConfigs) {
             this.bubbles.push(
@@ -174,6 +180,8 @@ export const Game = {
         this.ladders = ladderConfigs.map((c) => ({ ...c }));
         this.ceilingSpikesEnabled = ceilingSpikesEnabled;
         this.closingWallEnabled = closingWallEnabled;
+        this.currentWorld = worldIndex;
+        this.currentBackgroundPreset = backgroundPreset;
 
         const baseLevelTime = GAME_CONFIG.BASE_TIME +
             Math.floor((level - 1) / 5) * GAME_CONFIG.TIME_BONUS_PER_5_LEVELS;
@@ -204,6 +212,8 @@ export const Game = {
         this.closingWallEnabled = false;
         this.closingWallX = -this.closingWallWidth;
         this.levelTimeLimit = GAME_CONFIG.BASE_TIME;
+        this.currentWorld = 1;
+        this.currentBackgroundPreset = 'gridClassic';
         UI.setStatus('statusReady');
         Player.reset();
         Harpoon.reset();
@@ -264,7 +274,11 @@ export const Game = {
             this.lastFrameTime = timestamp - (elapsed % this.frameInterval);
             this.trackFps(timestamp);
 
-            Renderer.drawBackground(this.ceilingSpikesEnabled);
+            Renderer.drawBackground(
+                this.ceilingSpikesEnabled,
+                this.currentBackgroundPreset,
+                this.currentWorld
+            );
 
             if (!this.state.isPaused) {
                 this.updateLadderState();

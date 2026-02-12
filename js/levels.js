@@ -1,4 +1,15 @@
 // Level configurations
+export const LEVELS_PER_WORLD = 6;
+
+export const worldBackgroundPresets = {
+    1: 'gridClassic',
+    2: 'diagonalRush',
+    3: 'pulseFog',
+    4: 'gateCircuit',
+    5: 'deepField',
+    6: 'finalConvergence'
+};
+
 export const levelConfigs = [
     // ------------------------------
     // World 1 (Levels 1-6): Basics & First Verticality

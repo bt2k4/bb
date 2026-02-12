@@ -27,6 +27,8 @@ export const Renderer = {
     bgOffset: 0,
     lastThemeName: null,
     lastUiHeight: null,
+    lastBackgroundPreset: null,
+    lastWorldIndex: null,
     staticNeedsRedraw: true,
 
     init() {
@@ -60,7 +62,7 @@ export const Renderer = {
         this.staticNeedsRedraw = true;
     },
 
-    renderStaticLayer(theme) {
+    renderStaticLayer(theme, backgroundPreset = 'gridClassic', worldIndex = 1) {
         if (!this.staticCtx) {
             return;
         }
@@ -74,20 +76,122 @@ export const Renderer = {
             GAME_CONFIG.CANVAS_HEIGHT
         );
 
-        const gridColor = theme.vars['--primary'];
-        ctx.strokeStyle = gridColor;
-        ctx.globalAlpha = 0.15;
+        const primary = theme.vars['--primary'];
+        const secondary = theme.vars['--secondary'];
+        const accent = theme.vars['--accent'];
+
         ctx.lineWidth = 1;
 
-        const gridSize = 40;
-        for (let x = 0; x <= GAME_CONFIG.CANVAS_WIDTH; x += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, GAME_CONFIG.CANVAS_HEIGHT);
-            ctx.stroke();
+        switch (backgroundPreset) {
+        case 'diagonalRush': {
+            ctx.strokeStyle = primary;
+            ctx.globalAlpha = 0.13;
+            const gap = 50;
+            for (let offset = -GAME_CONFIG.CANVAS_HEIGHT; offset <= GAME_CONFIG.CANVAS_WIDTH; offset += gap) {
+                ctx.beginPath();
+                ctx.moveTo(offset, 0);
+                ctx.lineTo(offset + GAME_CONFIG.CANVAS_HEIGHT, GAME_CONFIG.CANVAS_HEIGHT);
+                ctx.stroke();
+            }
+            break;
         }
+        case 'pulseFog': {
+            const glow = ctx.createRadialGradient(
+                GAME_CONFIG.CANVAS_WIDTH * 0.5,
+                GAME_CONFIG.CANVAS_HEIGHT * 0.42,
+                20,
+                GAME_CONFIG.CANVAS_WIDTH * 0.5,
+                GAME_CONFIG.CANVAS_HEIGHT * 0.42,
+                GAME_CONFIG.CANVAS_WIDTH * 0.55
+            );
+            glow.addColorStop(0, themeColorToRgba(accent, 0.18));
+            glow.addColorStop(1, themeColorToRgba(accent, 0));
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, GAME_CONFIG.CANVAS_WIDTH, GAME_CONFIG.CANVAS_HEIGHT);
+
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.08;
+            for (let y = GAME_CONFIG.UI_HEIGHT; y <= GAME_CONFIG.CANVAS_HEIGHT; y += 36) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'gateCircuit': {
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.12;
+            for (let x = 0; x <= GAME_CONFIG.CANVAS_WIDTH; x += 80) {
+                ctx.strokeRect(x + 10, GAME_CONFIG.UI_HEIGHT + 18, 56, 76);
+            }
+            ctx.globalAlpha = 0.07;
+            for (let y = GAME_CONFIG.UI_HEIGHT + 130; y <= GAME_CONFIG.CANVAS_HEIGHT; y += 110) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'deepField': {
+            ctx.strokeStyle = primary;
+            ctx.globalAlpha = 0.1;
+            for (let x = 40; x <= GAME_CONFIG.CANVAS_WIDTH; x += 70) {
+                ctx.beginPath();
+                ctx.moveTo(x, GAME_CONFIG.UI_HEIGHT);
+                ctx.lineTo(x, GAME_CONFIG.CANVAS_HEIGHT);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 0.07;
+            for (let y = GAME_CONFIG.UI_HEIGHT + 40; y <= GAME_CONFIG.CANVAS_HEIGHT; y += 70) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'finalConvergence': {
+            ctx.strokeStyle = accent;
+            ctx.globalAlpha = 0.15;
+            const centerX = GAME_CONFIG.CANVAS_WIDTH / 2;
+            const centerY = GAME_CONFIG.CANVAS_HEIGHT * 0.5;
+            for (let radius = 80; radius < GAME_CONFIG.CANVAS_WIDTH; radius += 80) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 0.09;
+            for (let x = 0; x <= GAME_CONFIG.CANVAS_WIDTH; x += 60) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, GAME_CONFIG.UI_HEIGHT);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'gridClassic':
+        default: {
+            ctx.strokeStyle = primary;
+            ctx.globalAlpha = 0.15;
+            const gridSize = 40;
+            for (let x = 0; x <= GAME_CONFIG.CANVAS_WIDTH; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, GAME_CONFIG.CANVAS_HEIGHT);
+                ctx.stroke();
+            }
+            break;
+        }
+        }
+
         ctx.globalAlpha = 1.0;
 
+        const worldBadge = String(worldIndex || 1);
+        ctx.fillStyle = themeColorToRgba(accent, 0.3);
+        ctx.font = 'bold 16px "Courier New", monospace';
+        ctx.fillText(`W${worldBadge}`, GAME_CONFIG.CANVAS_WIDTH - 56, GAME_CONFIG.UI_HEIGHT + 24);
     },
 
     initStars() {
@@ -103,17 +207,21 @@ export const Renderer = {
     },
 
 
-    drawBackground(ceilingSpikesEnabled = true) {
+    drawBackground(ceilingSpikesEnabled = true, backgroundPreset = 'gridClassic', worldIndex = 1) {
         const theme = UI.getCurrentTheme();
         const ctx = this.ctx;
         const themeName = theme.name;
         if (this.staticNeedsRedraw ||
             this.lastThemeName !== themeName ||
-            this.lastUiHeight !== GAME_CONFIG.UI_HEIGHT) {
-            this.renderStaticLayer(theme);
+            this.lastUiHeight !== GAME_CONFIG.UI_HEIGHT ||
+            this.lastBackgroundPreset !== backgroundPreset ||
+            this.lastWorldIndex !== worldIndex) {
+            this.renderStaticLayer(theme, backgroundPreset, worldIndex);
             this.staticNeedsRedraw = false;
             this.lastThemeName = themeName;
             this.lastUiHeight = GAME_CONFIG.UI_HEIGHT;
+            this.lastBackgroundPreset = backgroundPreset;
+            this.lastWorldIndex = worldIndex;
         }
 
         if (this.staticCanvas) {
@@ -121,30 +229,109 @@ export const Renderer = {
         }
 
         const gridColor = theme.vars['--primary'];
-        ctx.strokeStyle = gridColor;
-        ctx.globalAlpha = 0.15;
+        const secondary = theme.vars['--secondary'];
+        const accent = theme.vars['--accent'];
         ctx.lineWidth = 1;
 
-        const gridSize = 40;
-        this.bgOffset = (this.bgOffset + 0.5) % gridSize;
-
-        for (let y = this.bgOffset; y <= GAME_CONFIG.CANVAS_HEIGHT; y += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y);
-            ctx.stroke();
+        switch (backgroundPreset) {
+        case 'diagonalRush': {
+            const spacing = 42;
+            this.bgOffset = (this.bgOffset + 1.1) % spacing;
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.14;
+            for (let y = this.bgOffset; y <= GAME_CONFIG.CANVAS_HEIGHT + spacing; y += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y - 54);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'pulseFog': {
+            this.bgOffset = (this.bgOffset + 0.03) % (Math.PI * 2);
+            const pulse = 0.06 + ((Math.sin(this.bgOffset) + 1) / 2) * 0.09;
+            ctx.fillStyle = themeColorToRgba(accent, pulse);
+            ctx.fillRect(0, GAME_CONFIG.UI_HEIGHT, GAME_CONFIG.CANVAS_WIDTH, GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.UI_HEIGHT);
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.09;
+            const spacing = 34;
+            for (let y = GAME_CONFIG.UI_HEIGHT; y <= GAME_CONFIG.CANVAS_HEIGHT; y += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y + Math.sin(this.bgOffset + y * 0.03) * 5);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y + Math.sin(this.bgOffset + y * 0.03) * 5);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'gateCircuit': {
+            const spacing = 64;
+            this.bgOffset = (this.bgOffset + 0.8) % spacing;
+            ctx.strokeStyle = gridColor;
+            ctx.globalAlpha = 0.11;
+            for (let x = -spacing; x <= GAME_CONFIG.CANVAS_WIDTH + spacing; x += spacing) {
+                const animatedX = x + this.bgOffset;
+                ctx.beginPath();
+                ctx.moveTo(animatedX, GAME_CONFIG.UI_HEIGHT);
+                ctx.lineTo(animatedX, GAME_CONFIG.CANVAS_HEIGHT);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'deepField': {
+            const spacing = 48;
+            this.bgOffset = (this.bgOffset + 0.45) % spacing;
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.09;
+            for (let y = GAME_CONFIG.UI_HEIGHT; y <= GAME_CONFIG.CANVAS_HEIGHT + spacing; y += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y - this.bgOffset);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y - this.bgOffset);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'finalConvergence': {
+            this.bgOffset = (this.bgOffset + 0.015) % (Math.PI * 2);
+            const centerX = GAME_CONFIG.CANVAS_WIDTH / 2;
+            const centerY = GAME_CONFIG.CANVAS_HEIGHT * 0.5;
+            ctx.strokeStyle = accent;
+            ctx.globalAlpha = 0.14;
+            for (let i = 0; i < 12; i++) {
+                const angle = this.bgOffset + i * (Math.PI / 6);
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + Math.cos(angle) * 520, centerY + Math.sin(angle) * 520);
+                ctx.stroke();
+            }
+            break;
+        }
+        case 'gridClassic':
+        default: {
+            ctx.strokeStyle = gridColor;
+            ctx.globalAlpha = 0.15;
+            const gridSize = 40;
+            this.bgOffset = (this.bgOffset + 0.5) % gridSize;
+            for (let y = this.bgOffset; y <= GAME_CONFIG.CANVAS_HEIGHT; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_CONFIG.CANVAS_WIDTH, y);
+                ctx.stroke();
+            }
+            break;
+        }
         }
         ctx.globalAlpha = 1.0;
 
         // Stars
-        ctx.fillStyle = gridColor;
-        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = backgroundPreset === 'finalConvergence' ? accent : gridColor;
+        ctx.globalAlpha = backgroundPreset === 'deepField' ? 0.7 : 0.5;
         for (const star of this.stars) {
             ctx.beginPath();
             ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             ctx.fill();
 
-            star.y += star.speed;
+            const speedBoost = backgroundPreset === 'diagonalRush' ? 1.5 : 1;
+            star.y += star.speed * speedBoost;
             if (star.y > GAME_CONFIG.CANVAS_HEIGHT) {
                 star.y = 0;
                 star.x = Math.random() * GAME_CONFIG.CANVAS_WIDTH;
