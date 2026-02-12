@@ -106,6 +106,12 @@ export const levelConfigs = [
             { x: 320, y: 150, size: 2, type: 'fast' },
             { x: 480, y: 150, size: 2, type: 'fast' },
             { x: 640, y: 150, size: 2, type: 'standard' }
+        ],
+        platforms: [
+            { x: 0, y: 400, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 380, y: 400, width: 30, height: 300 }
         ]
     },
     // Level 12: Laddered zigzag trio with a lower floor.
@@ -177,6 +183,20 @@ export const levelConfigs = [
             { x: 440, y: 150, size: 3, type: 'ghost' },
             { x: 660, y: 150, size: 3, type: 'phaseShift' },
             { x: 400, y: 230, size: 2, type: 'fast' }
+        ],
+        walls: [
+            {
+                x: 280,
+                width: 16,
+                doorHeight: 72,
+                unlockRegion: { xMin: 280, xMax: 800 }
+            },
+            {
+                x: 560,
+                width: 16,
+                doorHeight: 72,
+                unlockRegion: { xMin: 0, xMax: 560 }
+            }
         ]
     },
     // Level 18: World exam with deception trio and route gate.
@@ -249,6 +269,13 @@ export const levelConfigs = [
                 doorHeight: 68,
                 unlockRegion: { xMin: 0, xMax: 440 }
             }
+        ],
+        platforms: [
+            { x: 0, y: 360, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 96, y: 360, width: 28, height: 340 },
+            { x: 676, y: 360, width: 28, height: 340 }
         ]
     },
     // Level 22: Tiny swarm route-check with armored core.
@@ -351,7 +378,8 @@ export const levelConfigs = [
             { x: 640, y: 150, size: 2, type: 'fast' },
             { x: 240, y: 230, size: 1, type: 'fast' },
             { x: 560, y: 230, size: 1, type: 'fast' }
-        ]
+        ],
+        closingWall: true
     },
     // Level 28: Closing wall + dual boss bubbles.
     {
@@ -407,6 +435,14 @@ export const levelConfigs = [
             { x: 620, y: 150, size: 1, type: 'zigzag' },
             { x: 700, y: 150, size: 1, type: 'fast' },
             { x: 400, y: 220, size: 2, type: 'armored' }
+        ],
+        walls: [
+            {
+                x: 400,
+                width: 16,
+                doorHeight: 68,
+                unlockRegion: { xMin: 0, xMax: 400 }
+            }
         ]
     },
     // Level 32: Fast, phase-shift, and armored density + closing crush wall.
@@ -450,7 +486,16 @@ export const levelConfigs = [
             { x: 630, y: 150, size: 1, type: 'zigzag' },
             { x: 710, y: 150, size: 1, type: 'fast' },
             { x: 400, y: 230, size: 2, type: 'armored' }
-        ]
+        ],
+        platforms: [
+            { x: 0, y: 330, width: 800, height: 20 },
+            { x: 0, y: 500, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 120, y: 500, width: 28, height: 200 },
+            { x: 660, y: 330, width: 28, height: 170 }
+        ],
+        ceilingSpikes: false
     },
     // Level 35: Dual boss bubbles with quick mids + closing crush wall.
     {
@@ -480,5 +525,115 @@ export const levelConfigs = [
                 unlockRegion: { xMin: 0, xMax: 400 }
             }
         ]
+    },
+
+    // ------------------------------
+    // World 7 (Levels 37-40): Obstacle Remix
+    // ------------------------------
+    // Level 37: Mid-floor gate race with a closing-wall timer.
+    {
+        bubbles: [
+            { x: 220, y: 150, size: 3, type: 'fast' },
+            { x: 420, y: 150, size: 3, type: 'ghost' },
+            { x: 620, y: 150, size: 3, type: 'drifter' },
+            { x: 320, y: 250, size: 2, type: 'zigzag' }
+        ],
+        walls: [
+            {
+                x: 380,
+                width: 18,
+                doorHeight: 72,
+                unlockRegion: { xMin: 380, xMax: 800 }
+            }
+        ],
+        platforms: [
+            { x: 0, y: 360, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 82, y: 360, width: 28, height: 340 },
+            { x: 700, y: 360, width: 28, height: 340 }
+        ],
+        closingWall: true
+    },
+    // Level 38: No-ceiling three-tier route with split unlock lanes.
+    {
+        bubbles: [
+            { x: 180, y: 150, size: 2, type: 'phaseShift' },
+            { x: 360, y: 150, size: 2, type: 'rhythm' },
+            { x: 540, y: 150, size: 2, type: 'ghost' },
+            { x: 700, y: 150, size: 2, type: 'fast' },
+            { x: 260, y: 320, size: 2, type: 'drifter' },
+            { x: 580, y: 520, size: 2, type: 'heavy' }
+        ],
+        walls: [
+            {
+                x: 280,
+                width: 16,
+                doorHeight: 70,
+                unlockRegion: { xMin: 0, xMax: 280 }
+            },
+            {
+                x: 540,
+                width: 16,
+                doorHeight: 70,
+                unlockRegion: { xMin: 540, xMax: 800 }
+            }
+        ],
+        platforms: [
+            { x: 0, y: 280, width: 800, height: 20 },
+            { x: 0, y: 460, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 120, y: 460, width: 28, height: 240 },
+            { x: 670, y: 280, width: 28, height: 180 }
+        ],
+        ceilingSpikes: false
+    },
+    // Level 39: Closing pressure with tiny swarm and armored anchor.
+    {
+        bubbles: [
+            { x: 160, y: 150, size: 1, type: 'fast' },
+            { x: 240, y: 150, size: 1, type: 'zigzag' },
+            { x: 320, y: 150, size: 1, type: 'fast' },
+            { x: 400, y: 150, size: 1, type: 'rhythm' },
+            { x: 480, y: 150, size: 1, type: 'phaseShift' },
+            { x: 560, y: 150, size: 1, type: 'fast' },
+            { x: 640, y: 150, size: 1, type: 'zigzag' },
+            { x: 400, y: 240, size: 2, type: 'armored' }
+        ],
+        closingWall: true
+    },
+    // Level 40: Final obstacle mashup with dual gates and timer wall.
+    {
+        bubbles: [
+            { x: 220, y: 150, size: 4, type: 'armored' },
+            { x: 560, y: 150, size: 3, type: 'phaseShift' },
+            { x: 380, y: 210, size: 2, type: 'rhythm' },
+            { x: 260, y: 250, size: 2, type: 'fast' },
+            { x: 520, y: 250, size: 2, type: 'zigzag' },
+            { x: 400, y: 520, size: 2, type: 'drifter' }
+        ],
+        walls: [
+            {
+                x: 260,
+                width: 16,
+                doorHeight: 70,
+                unlockRegion: { xMin: 260, xMax: 800 }
+            },
+            {
+                x: 540,
+                width: 16,
+                doorHeight: 70,
+                unlockRegion: { xMin: 0, xMax: 540 }
+            }
+        ],
+        platforms: [
+            { x: 0, y: 360, width: 800, height: 20 }
+        ],
+        ladders: [
+            { x: 96, y: 360, width: 28, height: 340 },
+            { x: 676, y: 360, width: 28, height: 340 }
+        ],
+        closingWall: true
     }
 ];
